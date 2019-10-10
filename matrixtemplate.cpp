@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string>
+#include <iostream>
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -31,20 +32,22 @@ Multiply( glm::mat4 a, glm::vec3 b )
 glm::vec3
 ScalePointAroundAnotherPoint( glm::vec3 inputPoint, glm::vec3 centerPoint, glm::vec3 scale )
 {
-	glm::vec3 origin = inputPoint - centerPoint;
-	//Identity matrix
+	
+    //Identity matrix
 	glm::mat4 identity_matrix = glm::mat4(glm::vec4(1, 0, 0, 0), glm::vec4(0, 1, 0, 0), glm::vec4(0, 0, 1, 0), glm::vec4(0, 0, 0, 1));
 
-	//Move to origin
-	glm::mat4 matrix = translate(identity_matrix, origin);
+    //Move 
+    glm::mat4 inverse_matrix = translate(identity_matrix, centerPoint);
 
 	//Scale
-	matrix = scale(matrix, scale);
+	glm::mat4 scale_matrix = glm::scale(inverse_matrix, scale);
 
-	//Move back
-	matrix = translate(matrix, inputPoint);
+	//Move 
+	glm::mat4 translation_matrix = translate(scale_matrix, -centerPoint);
 
-	return origin;
+
+    return Multiply(translation_matrix, inputPoint);
+	
 }
 
 
@@ -52,8 +55,21 @@ ScalePointAroundAnotherPoint( glm::vec3 inputPoint, glm::vec3 centerPoint, glm::
 glm::vec3
 RotatePointAroundAnotherPoint( glm::vec3 inputPoint, glm::vec3 centerPoint, glm::mat4 first, glm::mat4 second, glm::mat4 third )
 {
-	//???
+    //Identity matrix
+	glm::mat4 identity_matrix = glm::mat4(glm::vec4(1, 0, 0, 0), glm::vec4(0, 1, 0, 0), glm::vec4(0, 0, 1, 0), glm::vec4(0, 0, 0, 1));
+
+    //Move
+    glm::mat4 inverse_matrix = translate(identity_matrix, centerPoint);
+
+    //Rotate
+    glm::mat4 rotate_matrix = Multiply(Multiply(Multiply(inverse_matrix, first), second), third);
+
+    //Move 
+	glm::mat4 translation_matrix = translate(rotate_matrix, -centerPoint);
+
+    return Multiply(translation_matrix, inputPoint);
 }
+
 
 
 void
@@ -76,18 +92,31 @@ PrintMatrix( glm::mat4 mat )
 int main(){
 
 	//teting
-	glm::mat4 mat1 = glm::mat4(glm::vec4(2, 2, 2, 2), glm::vec4(3, 3, 3, 3), glm::vec4(4, 4, 4, 4), glm::vec4(3, 3, 3, 3));
-	glm::mat4 mat2 = glm::mat4(glm::vec4(3, 3, 3, 3), glm::vec4(4, 4, 4, 4), glm::vec4(3, 3, 3, 3), glm::vec4(2, 2, 2, 2));
-	glm::vec3 vec1 = glm::vec3(5, 5, 5);
-	glm::vec3 vec2 = glm::vec3(3, 4, 5);
-	glm::vec3 scale = glm::vec3(2, 2, 2);
+	glm::mat4 mat1 = glm::mat4(glm::vec4(2, 2, 2, 2), glm::vec4(2, 2, 2, 2), glm::vec4(2, 2, 2, 2), glm::vec4(2, 2, 2, 2));
+	glm::mat4 mat2 = glm::mat4(glm::vec4(3, 3, 3, 3), glm::vec4(3, 3, 3, 3), glm::vec4(3, 3, 3, 3), glm::vec4(3, 3, 3, 3));
+	glm::mat4 mat3 = glm::mat4(glm::vec4(4, 4, 4, 4), glm::vec4(4, 4, 4, 4), glm::vec4(4, 4, 4, 4), glm::vec4(4, 4, 4, 4));
 
 
-	PrintMatrix(Multiply(mat1, mat2));
+    glm::vec3 vec1 = glm::vec3(1, 1, 0);
+	glm::vec3 vec2 = glm::vec3(0, 0, 0);
+	
+    glm::vec3 vec3 = glm::vec3(2, 0, 0);
+    glm::vec3 vec4 = glm::vec3(5, 0, 0);
+    glm::vec3 vec5 = glm::vec3(7, 0, 0);
 
-	std::cout << Multiply(mat1, vec1) << std::endl;
+    //problem 1 is good
+    //Problem 2 is good
+    glm::vec3 result; //= Multiply(mat1, vec1);
+    
+    //std::cout << result[0] << " " << result[1] << " " << result[2];
 
-	ScalePointAroundAnotherPoint(vec1, vec2, scale);
+
+
+	result = RotatePointAroundAnotherPoint(vec1, vec2, mat1, mat2, mat3 ); 
+    
+    std::cout << result[0] << " " << result[1] << " " << result[2] << std::endl;
+
+
 
 	return 0;
 }
