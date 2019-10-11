@@ -62,7 +62,7 @@ RotatePointAroundAnotherPoint( glm::vec3 inputPoint, glm::vec3 centerPoint, glm:
     glm::mat4 inverse_matrix = translate(identity_matrix, centerPoint);
 
     //Rotate
-    glm::mat4 rotate_matrix = Multiply(Multiply(Multiply(inverse_matrix, first), second), third);
+    glm::mat4 rotate_matrix = Multiply(Multiply(Multiply(inverse_matrix, third), second), first);
 
     //Move 
 	glm::mat4 translation_matrix = translate(rotate_matrix, -centerPoint);
@@ -91,28 +91,21 @@ PrintMatrix( glm::mat4 mat )
 
 int main(){
 
-	//teting
-	glm::mat4 mat1 = glm::mat4(glm::vec4(2, 2, 2, 2), glm::vec4(2, 2, 2, 2), glm::vec4(2, 2, 2, 2), glm::vec4(2, 2, 2, 2));
-	glm::mat4 mat2 = glm::mat4(glm::vec4(3, 3, 3, 3), glm::vec4(3, 3, 3, 3), glm::vec4(3, 3, 3, 3), glm::vec4(3, 3, 3, 3));
-	glm::mat4 mat3 = glm::mat4(glm::vec4(4, 4, 4, 4), glm::vec4(4, 4, 4, 4), glm::vec4(4, 4, 4, 4), glm::vec4(4, 4, 4, 4));
 
 
-    glm::vec3 vec1 = glm::vec3(1, 1, 0);
-	glm::vec3 vec2 = glm::vec3(0, 0, 0);
+    glm::vec3 vec1 = glm::vec3(1.0f, 1.0f, 0.0f);
+	glm::vec3 vec2 = glm::vec3(-2.0f, 0.0f, 0.0f);
 	
-    glm::vec3 vec3 = glm::vec3(2, 0, 0);
-    glm::vec3 vec4 = glm::vec3(5, 0, 0);
-    glm::vec3 vec5 = glm::vec3(7, 0, 0);
 
-    //problem 1 is good
-    //Problem 2 is good
+    glm::mat4 firstRot = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    glm::mat4 secondRot = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 thirdRot = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+
     glm::vec3 result; //= Multiply(mat1, vec1);
     
-    //std::cout << result[0] << " " << result[1] << " " << result[2];
 
-
-
-	result = RotatePointAroundAnotherPoint(vec1, vec2, mat1, mat2, mat3 ); 
+	result = RotatePointAroundAnotherPoint(vec1, vec2, firstRot, secondRot, thirdRot ); 
     
     std::cout << result[0] << " " << result[1] << " " << result[2] << std::endl;
 
